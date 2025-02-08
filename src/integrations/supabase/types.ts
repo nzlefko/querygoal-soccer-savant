@@ -9,7 +9,101 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      matches: {
+        Row: {
+          away_score: number
+          away_team: string
+          created_at: string | null
+          home_score: number
+          home_team: string
+          id: number
+          league: string
+          match_date: string
+          season: string
+        }
+        Insert: {
+          away_score?: number
+          away_team: string
+          created_at?: string | null
+          home_score?: number
+          home_team: string
+          id?: number
+          league: string
+          match_date: string
+          season: string
+        }
+        Update: {
+          away_score?: number
+          away_team?: string
+          created_at?: string | null
+          home_score?: number
+          home_team?: string
+          id?: number
+          league?: string
+          match_date?: string
+          season?: string
+        }
+        Relationships: []
+      }
+      queries: {
+        Row: {
+          created_at: string | null
+          id: number
+          query_text: string
+          result_data: Json
+          result_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          query_text: string
+          result_data: Json
+          result_type: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          query_text?: string
+          result_data?: Json
+          result_type?: string
+        }
+        Relationships: []
+      }
+      statistics: {
+        Row: {
+          away_value: number
+          created_at: string | null
+          home_value: number
+          id: number
+          match_id: number | null
+          stat_type: string
+        }
+        Insert: {
+          away_value?: number
+          created_at?: string | null
+          home_value?: number
+          id?: number
+          match_id?: number | null
+          stat_type: string
+        }
+        Update: {
+          away_value?: number
+          created_at?: string | null
+          home_value?: number
+          id?: number
+          match_id?: number | null
+          stat_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "statistics_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

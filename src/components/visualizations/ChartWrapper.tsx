@@ -1,9 +1,11 @@
+
+import { ReactElement } from 'react';
 import { ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface ChartWrapperProps {
   title: string;
-  children: React.ReactNode;
+  children: ReactElement;
 }
 
 const ChartWrapper = ({ title, children }: ChartWrapperProps) => {
