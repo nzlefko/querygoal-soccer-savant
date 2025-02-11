@@ -23,7 +23,16 @@ serve(async (req) => {
 
     // Validate OpenAI API key
     if (!Deno.env.get('OPENAI_API_KEY')) {
-      throw new Error('OpenAI API key is not configured');
+      return new Response(
+        JSON.stringify({
+          type: 'text',
+          title: 'Configuration Error',
+          data: 'OpenAI API key is not configured'
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     try {
@@ -38,8 +47,8 @@ serve(async (req) => {
             content: query
           }
         ],
-        model: "gpt-4o-mini", // Using the smaller, more cost-effective model
-        max_tokens: 150, // Limit the response size
+        model: "gpt-4o-mini",
+        max_tokens: 150,
       });
 
       const response = {
@@ -59,35 +68,27 @@ serve(async (req) => {
     } catch (openAiError: any) {
       console.error('OpenAI API Error:', openAiError);
       
-      // Check for rate limit or quota errors
-      if (openAiError.status === 429) {
-        return new Response(
-          JSON.stringify({
-            error: "Service is currently busy. Please try again in a few moments.",
-            type: 'text',
-            title: 'Error',
-            data: "The service is temporarily unavailable. Please try again later."
-          }),
-          {
-            status: 429,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        );
-      }
-
-      throw openAiError;
+      // Return a regular response with error information
+      return new Response(
+        JSON.stringify({
+          type: 'text',
+          title: 'Service Unavailable',
+          data: 'The service is temporarily unavailable. Please try again later.'
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
   } catch (error) {
     console.error('Error in process-query function:', error);
     return new Response(
       JSON.stringify({
-        error: error.message,
         type: 'text',
         title: 'Error',
         data: "Sorry, we couldn't process your query at this time. Please try again later."
       }),
       {
-        status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
