@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import SearchBar from '../components/SearchBar';
@@ -12,8 +13,7 @@ const Index = () => {
   const handleSearch = async (query: string) => {
     setIsLoading(true);
     try {
-      // For development, using a temporary API key. In production, this should be handled securely
-      const nlpService = createNLPService('your-openai-key-here');
+      const nlpService = createNLPService();
       const queryResult = await nlpService.processQuery(query);
       setResult(queryResult);
     } catch (error) {

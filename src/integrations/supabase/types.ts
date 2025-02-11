@@ -52,6 +52,7 @@ export type Database = {
           query_text: string
           result_data: Json
           result_type: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
@@ -59,6 +60,7 @@ export type Database = {
           query_text: string
           result_data: Json
           result_type: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -66,6 +68,22 @@ export type Database = {
           query_text?: string
           result_data?: Json
           result_type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      secrets: {
+        Row: {
+          key: string
+          value: string
+        }
+        Insert: {
+          key: string
+          value: string
+        }
+        Update: {
+          key?: string
+          value?: string
         }
         Relationships: []
       }
