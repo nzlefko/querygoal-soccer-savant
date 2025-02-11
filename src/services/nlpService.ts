@@ -14,7 +14,14 @@ export class NLPService {
         body: { query },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase function error:', error);
+        return {
+          type: 'text',
+          title: 'Error',
+          data: error.message || 'An error occurred while processing your query'
+        };
+      }
 
       return data as QueryResult;
     } catch (error) {

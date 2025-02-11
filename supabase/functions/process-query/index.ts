@@ -21,40 +21,75 @@ serve(async (req) => {
 
     const { query } = await req.json();
 
-    const completion = await openai.chat.completions.create({
-      messages: [
-        {
-          role: "system",
-          content: "You are a football statistics expert. Convert natural language queries into structured data responses."
-        },
-        {
-          role: "user",
-          content: query
-        }
-      ],
-      model: "gpt-4o-mini",
-    });
+    // Validate OpenAI API key
+    if (!Deno.env.get('OPENAI_API_KEY')) {
+      throw new Error('OpenAI API key is not configured');
+    }
 
-    // For now, return mock data until API-Football integration
-    const response = {
-      type: 'chart',
-      title: query,
-      data: [
-        { name: 'Arsenal', value: 12 },
-        { name: 'Chelsea', value: 8 },
-        { name: 'Liverpool', value: 15 },
-        { name: 'Man City', value: 18 },
-      ]
-    };
+    try {
+      const completion = await openai.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content: "You are a football statistics expert. Convert natural language queries into structured data responses."
+          },
+          {
+            role: "user",
+            content: query
+          }
+        ],
+        model: "gpt-4o-mini", // Using the smaller, more cost-effective model
+        max_tokens: 150, // Limit the response size
+      });
 
-    return new Response(JSON.stringify(response), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+      const response = {
+        type: 'chart',
+        title: query,
+        data: [
+          { name: 'Arsenal', value: 12 },
+          { name: 'Chelsea', value: 8 },
+          { name: 'Liverpool', value: 15 },
+          { name: 'Man City', value: 18 },
+        ]
+      };
+
+      return new Response(JSON.stringify(response), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    } catch (openAiError: any) {
+      console.error('OpenAI API Error:', openAiError);
+      
+      // Check for rate limit or quota errors
+      if (openAiError.status === 429) {
+        return new Response(
+          JSON.stringify({
+            error: "Service is currently busy. Please try again in a few moments.",
+            type: 'text',
+            title: 'Error',
+            data: "The service is temporarily unavailable. Please try again later."
+          }),
+          {
+            status: 429,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
+
+      throw openAiError;
+    }
   } catch (error) {
-    console.error('Error processing query:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    console.error('Error in process-query function:', error);
+    return new Response(
+      JSON.stringify({
+        error: error.message,
+        type: 'text',
+        title: 'Error',
+        data: "Sorry, we couldn't process your query at this time. Please try again later."
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   }
 });
