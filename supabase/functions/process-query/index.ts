@@ -47,10 +47,15 @@ serve(async (req) => {
             content: query
           }
         ],
-        model: "gpt-4o-mini",
+        model: "gpt-3.5-turbo", // Updated to use a valid model name
         max_tokens: 150,
       });
 
+      // Process the completion response
+      const content = completion.choices[0].message.content;
+      console.log("OpenAI response:", content);
+
+      // For now, return sample data
       const response = {
         type: 'chart',
         title: query,
